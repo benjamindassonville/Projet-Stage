@@ -1,0 +1,3 @@
+url: 'https://egbicsdgitdwbxxbcvmb.supabase.co'
+
+anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnYmljc2RnaXRkd2J4eGJjdm1iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4NDQwMTAsImV4cCI6MjA4MzQyMDAxMH0.bu5nnKXXdpVLgHl62nLjxVgUuz3mxzJpiYIJMkDrJkg'
