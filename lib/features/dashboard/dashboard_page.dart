@@ -3,7 +3,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/auth/permission.dart';
 import '../../widgets/permission_guard.dart';
+
 import '../clients/client_list_page.dart';
+import '../clients/client_form_page.dart';
+
+import '../interventions/intervention_list_page.dart';
+import '../interventions/intervention_form_page.dart';
+
+import '../planning/planning_page.dart';
 
 class DashboardPage extends StatelessWidget {
   final String role;
@@ -28,7 +35,6 @@ class DashboardPage extends StatelessWidget {
             tooltip: 'Se déconnecter',
             onPressed: () async {
               await Supabase.instance.client.auth.signOut();
-              // AuthGate gère automatiquement la redirection
             },
           ),
         ],
@@ -36,22 +42,46 @@ class DashboardPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ---- Infos utilisateur ----
           Text(
             'Bienvenue, ${user?.email ?? 'utilisateur'}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text('Rôle : $role'),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          // =====================================================
-          // CLIENTS
-          // =====================================================
-          const Text(
-            'Clients',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          // =========================
+          // PLANNING
+          // =========================
+          const Text('Planning', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+
+          PermissionGuard(
+            permissions: permissions,
+            requiredPermission: Permission.interventionRead,
+            child: Card(
+              child: ListTile(
+                leading: const Icon(Icons.event_note),
+                title: const Text('Mon planning'),
+                subtitle: const Text('Vue jour / semaine'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PlanningPage(permissions: permissions),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
+
+          const SizedBox(height: 24),
+
+          // =========================
+          // CLIENTS
+          // =========================
+          const Text('Clients', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
 
           PermissionGuard(
@@ -61,14 +91,11 @@ class DashboardPage extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.people),
                 title: const Text('Voir les clients'),
-                subtitle: const Text('Liste et fiches clients'),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ClientListPage(
-                        permissions: permissions,
-                      ),
+                      builder: (_) => ClientListPage(permissions: permissions),
                     ),
                   );
                 },
@@ -83,13 +110,13 @@ class DashboardPage extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.person_add),
                 title: const Text('Ajouter un client'),
-                subtitle: const Text('Créer une nouvelle fiche client'),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ClientListPage(
+                      builder: (_) => ClientFormPage(
                         permissions: permissions,
+                        mode: ClientFormMode.create,
                       ),
                     ),
                   );
@@ -98,15 +125,12 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          // =====================================================
-          // INTERVENTIONS (préparation 5.2)
-          // =====================================================
-          const Text(
-            'Interventions',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          // =========================
+          // INTERVENTIONS
+          // =========================
+          const Text('Interventions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
 
           PermissionGuard(
@@ -116,11 +140,11 @@ class DashboardPage extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.build),
                 title: const Text('Voir les interventions'),
-                subtitle: const Text('Liste et planning des interventions'),
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Module interventions (étape 5.2)'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InterventionListPage(permissions: permissions),
                     ),
                   );
                 },
@@ -134,91 +158,15 @@ class DashboardPage extends StatelessWidget {
             child: Card(
               child: ListTile(
                 leading: const Icon(Icons.add_circle_outline),
-                title: const Text('Créer une intervention'),
-                subtitle: const Text('Planifier une nouvelle intervention'),
+                title: const Text('Ajouter une intervention'),
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Création intervention (étape 5.2)'),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // =====================================================
-          // ADMINISTRATION
-          // =====================================================
-          const Text(
-            'Administration',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-
-          PermissionGuard(
-            permissions: permissions,
-            requiredPermission: Permission.roleManage,
-            child: Card(
-              child: ListTile(
-                leading: const Icon(Icons.admin_panel_settings),
-                title: const Text('Gérer les rôles & permissions'),
-                subtitle: const Text('Administration des accès'),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Administration rôles (à venir)'),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          PermissionGuard(
-            permissions: permissions,
-            requiredPermission: Permission.userManage,
-            child: Card(
-              child: ListTile(
-                leading: const Icon(Icons.manage_accounts),
-                title: const Text('Gérer les utilisateurs'),
-                subtitle: const Text('Création et gestion des comptes'),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Administration utilisateurs (à venir)'),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // =====================================================
-          // DONNÉES
-          // =====================================================
-          const Text(
-            'Données',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-
-          PermissionGuard(
-            permissions: permissions,
-            requiredPermission: Permission.dataExport,
-            child: Card(
-              child: ListTile(
-                leading: const Icon(Icons.download),
-                title: const Text('Exporter les données (CSV)'),
-                subtitle: const Text('Clients et interventions'),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Export CSV (à venir)'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InterventionFormPage(
+                        permissions: permissions,
+                        mode: InterventionFormMode.create,
+                      ),
                     ),
                   );
                 },
